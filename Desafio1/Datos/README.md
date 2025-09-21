@@ -1,4 +1,4 @@
-\# Función de la carpeta
+# Función de la carpeta
 
 
 
@@ -6,7 +6,7 @@ En esta carpeta se deben copiar y pegar los archivos del dataset con los cuales 
 
 
 
-\## Requistios del dataset
+## Requistios del dataset
 
 * Los archivos deben tener una extensión.txt
 
