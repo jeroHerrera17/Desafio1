@@ -8,7 +8,7 @@ using namespace std;
  * @brief Muestra el contenido de un arreglo de bytes como texto imprimible.
  *
  * Esta función recorre un arreglo de bytes y muestra en consola
- * únicamente los caracteres imprimibles (códigos ASCII 32 a 126).
+ * los caracteres ASCII que son letras como char y el resto de caracteres como enteros
  * Los caracteres no imprimibles son omitidos.
  *
  * @param titulo Texto que se mostrará como encabezado antes del contenido.
@@ -19,10 +19,10 @@ void mostrarContenido(const string& titulo, unsigned char* contenido, int size) 
     cout << titulo << endl;
 
     for (int i = 0; i < size; ++i) {
-        if (contenido[i] >= 32 && contenido[i] <= 126) {
-            cout << contenido[i];  ///< Se imprimen solo caracteres ASCII legibles
+        if ((contenido[i] >= 'a'&& contenido[i] <= 'z'||contenido[i] >= 'A'&& contenido[i] <= 'Z') ) {
+            cout << contenido[i];  // solo se imprimen caracteres que son letras
         } else {
-            continue;  ///< Caracteres no imprimibles son ignorados
+          cout<<(int)contenido[i];  //caracteres diferentes de letras se imprimen como enteros
         }
     }
     cout << endl << endl;
@@ -41,7 +41,7 @@ void mostrarContenido(const string& titulo, unsigned char* contenido, int size) 
  * @return int Código de salida (0 si termina correctamente).
  */
 int main() {
-    string rutaArchivo = "../../Datos/Encriptado1.txt"; ///< Ruta relativa al archivo a leer
+    string rutaArchivo = "../../Datos/Encriptado2.txt"; ///< Ruta relativa al archivo a leer
     int size = 0;
 
     // Leer el archivo en memoria dinámica
@@ -62,7 +62,7 @@ int main() {
 
         // Rotar bits a la derecha (ejemplo: 3 posiciones)
         RotarDerecha(size, encriptacion, 3);
-        mostrarContenido("Contenido despues de rotación:", encriptacion, size);
+        mostrarContenido("Contenido despues de rotacion:", encriptacion, size);
 
         // Liberar memoria asignada
         delete[] encriptacion;

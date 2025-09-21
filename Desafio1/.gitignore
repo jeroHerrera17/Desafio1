@@ -53,6 +53,7 @@ CMakeLists.txt.user*
 *.pdb
 *.sln
 *.suo
+
 *.vcproj
 *vcproj.*.*.user
 *.ncb
@@ -72,8 +73,7 @@ CMakeLists.txt.user*
 # --------
 *.dll
 *.exe
-#ignorar carpeta de datos
-Datos/
+
 # Directories with generated files
 .moc/
 .obj/
@@ -81,3 +81,9 @@ Datos/
 .rcc/
 .uic/
 /build*/
+# Ignorar todo dentro de Datos
+Datos/*
+
+# Pero no ignorar el README.md
+!Datos/README.md
+
