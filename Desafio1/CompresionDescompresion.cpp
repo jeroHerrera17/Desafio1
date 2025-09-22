@@ -49,18 +49,7 @@ int numeroAAscii(int numero, unsigned char* destino) {
  */
 unsigned char* compresionRlE(unsigned char* arreglo, int longitud) {
     // Calcular tamaño comprimido
-    int tamanocomprimido = 0;
-    for (int i = 0; i < longitud; ) {
-        unsigned char caracter_actual = arreglo[i];
-        int contador = 0;
-
-        while (i < longitud && arreglo[i] == caracter_actual) {
-            contador++;
-            i++;
-        }
-
-        tamanocomprimido += contarDigitos(contador) + 1; // +1 por el carácter
-    }
+    c
 
     // Crear buffer comprimido (+1 para terminador nulo)
     unsigned char* arregloComprimido = new unsigned char[tamanocomprimido + 1];
@@ -85,3 +74,53 @@ unsigned char* compresionRlE(unsigned char* arreglo, int longitud) {
     arregloComprimido[posicion] = '\0'; // terminador nulo
     return arregloComprimido;
 }
+
+/**
+ * @brief descomprime un arreglo previamente comprimido usando elalgoritmo RLE (Run-Length Encoding).
+ *
+ * este algoritmo multiplica un caracter A de una secuencia de estos por la cantidad n que sea
+ * mencionada en el mismo.
+ * Ejemplo: "4A3B2C1D2A" -> "AAAABBBCCDAA".
+ *
+ * @param arreglo puntero a un arreglo de caracteres previamente comprimido.
+ * @param longitud cantidad de caracteres del arreglo de entrada.
+ * @return unsigned char* Puntero al texto descomprimido (dinámico, debe liberarse con delete[]).
+*/
+unsigned char* descompresionRLE(unsigned char* entrada){
+    int capacidad = 100; //la capcidad inicial de la salida, esta podra ir variando dependiendo si se necesite
+    unsigned char* arregloDescomprimido = new unsigned char[capacidad];
+    int pos = 0; //posicion inicial del arreglo
+    int n = 0; //acumulador
+
+    for(int i = 0; entrada[i] != '\0'; i++){
+        char c = entrada[i];
+        if(c >= '0' && c <= '9'){
+            n = n * 10 +(c - '0');
+        }
+        else{
+            //en caso de acabarse la capacidad de almacenamiento esta se actualizara
+            while(pos + n >= capacidad){
+                capacidad *= 2;
+                unsigned char* temp = new unsigned char[capacidad];
+                for (int k = 0; k < pos; k++) temp[k] = arregloDescomprimido[k];
+                delete[] arregloDescomprimido;
+                arregloDescomprimido = temp;
+            }
+            // agregar el carácter repetido n-veces
+            for (int j = 0; j < n; j++) {
+                arregloDescomprimido[pos++] = c;
+            }
+
+        n = 0; // reiniciar para el próximo bloque
+        }
+    }
+
+    arregloDescomprimido[pos] = '\0';
+    return arregloDescomprimido;
+}
+
+
+
+
+
+

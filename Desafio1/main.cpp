@@ -19,7 +19,7 @@ void mostrarContenido(const string& titulo, unsigned char* contenido, int size) 
     cout << titulo << endl;
 
     for (int i = 0; i < size; ++i) {
-        if ((contenido[i] >= 'a'&& contenido[i] <= 'z'||contenido[i] >= 'A'&& contenido[i] <= 'Z') ) {
+        if ((contenido[i] >= 'a'&& contenido[i] <= 'z')||(contenido[i] >= 'A'&& contenido[i] <= 'Z') ) {
             cout << contenido[i];  // solo se imprimen caracteres que son letras
         } else {
           cout<<(int)contenido[i];  //caracteres diferentes de letras se imprimen como enteros
