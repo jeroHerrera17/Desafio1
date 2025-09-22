@@ -49,7 +49,18 @@ int numeroAAscii(int numero, unsigned char* destino) {
  */
 unsigned char* compresionRlE(unsigned char* arreglo, int longitud) {
     // Calcular tamaño comprimido
-    c
+    int tamanocomprimido = 0;
+    for (int i = 0; i < longitud; ) {
+        unsigned char caracter_actual = arreglo[i];
+        int contador = 0;
+
+        while (i < longitud && arreglo[i] == caracter_actual) {
+            contador++;
+            i++;
+        }
+
+        tamanocomprimido += contarDigitos(contador) + 1; // +1 por el carácter
+    }
 
     // Crear buffer comprimido (+1 para terminador nulo)
     unsigned char* arregloComprimido = new unsigned char[tamanocomprimido + 1];
