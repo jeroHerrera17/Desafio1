@@ -49,25 +49,42 @@ void RotarDerecha(int tamaño, unsigned char* texto, int n);
  * @param n Número de posiciones a rotar (0-7).
  */
 void RotarIzquierda(int tamaño, unsigned char* texto, int n);
+
 /**
- * @brief Comprime un arreglo de caracteres usando el algoritmo RLE (Run-Length Encoding).
+ * @brief   Descomprime una secuencia codificada con el algoritmo LZ78.
  *
- * Este algoritmo reemplaza secuencias consecutivas de caracteres repetidos por
- * el número de repeticiones seguido del carácter. Por ejemplo:
- * - Entrada: "AAAABBBCCDAA"
- * - Salida:  "4A3B2C1D2A"
+ * Esta función recibe un arreglo de bytes que representa la compresión
+ * de un texto bajo el esquema LZ78, y reconstruye la cadena original.
  *
- * @param arreglo Puntero a un arreglo de caracteres sin comprimir.
- * @param longitud Cantidad de caracteres en el arreglo de entrada.
- * @return int Siempre devuelve 0 en esta versión (se podría cambiar para retornar la longitud comprimida).
- */
-int compresionRlE(unsigned char* arreglo, int longitud);
-/**
- * @brief descompresionLZ78
- * @param data
- * @param size
- * @param total
- * @return
+ * El formato esperado en `data` es una secuencia de pares (número, letra),
+ * donde el número referencia a una entrada previa del diccionario y la
+ * letra es el nuevo carácter a concatenar. La numeración empieza en 1
+ * (entrada 0 indica que el carácter no depende de ninguna cadena previa).
+ *
+ * Ejemplo de entrada:
+ * ```
+ * 0a 0b 1c ...
+ * ```
+ *
+ * El algoritmo realiza dos pasadas:
+ *  - **Primera pasada:** Calcula el tamaño total del resultado para
+ *    reservar memoria.
+ *  - **Segunda pasada:** Reconstruye cada cadena usando el diccionario
+ *    dinámico y las copia al buffer de salida.
+ *
+ * @param data   Puntero al arreglo de datos comprimidos (entrada).
+ * @param size   Cantidad de bytes en el arreglo `data`.
+ * @param total  Referencia donde se almacena el tamaño total del texto
+ *               descomprimido (longitud del resultado sin incluir `\0`).
+ *
+ * @return Un puntero a un arreglo dinámico de caracteres (unsigned char*)
+ *         que contiene el texto descomprimido terminado en `\0`.
+ *         El llamador es responsable de liberar esta memoria con `delete[]`.
+ * @note
+ * - El diccionario se maneja con índices crecientes.
+ * - La función imprime mensajes de depuración por consola (`cout` y `cerr`).
+ * - Si la reconstrucción genera menos caracteres de los esperados,
+ *   se muestra una advertencia.
  */
 unsigned char* descompresionLZ78(unsigned char* data,int size,int& total);
 

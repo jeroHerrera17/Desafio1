@@ -1,77 +1,170 @@
 #include <iostream>
 
 using namespace std;
-unsigned char* descompresionLZ78(unsigned char* data, int size,int& total) {
+
+
+/**
+ * @brief   Descomprime una secuencia codificada con el algoritmo LZ78.
+ *
+ * Esta función recibe un arreglo de bytes que representa la compresión
+ * de un texto bajo el esquema LZ78, y reconstruye la cadena original.
+ *
+ * El formato esperado en `data` es una secuencia de pares (número, letra),
+ * donde el número referencia a una entrada previa del diccionario y la
+ * letra es el nuevo carácter a concatenar. La numeración empieza en 1
+ * (entrada 0 indica que el carácter no depende de ninguna cadena previa).
+ *
+ * Ejemplo de entrada:
+ * ```
+ * 0a 0b 1c ...
+ * ```
+ *
+ * El algoritmo realiza dos pasadas:
+ *  - **Primera pasada:** Calcula el tamaño total del resultado para
+ *    reservar memoria.
+ *  - **Segunda pasada:** Reconstruye cada cadena usando el diccionario
+ *    dinámico y las copia al buffer de salida.
+ *
+ * @param data   Puntero al arreglo de datos comprimidos (entrada).
+ * @param size   Cantidad de bytes en el arreglo `data`.
+ * @param total  Referencia donde se almacena el tamaño total del texto
+ *               descomprimido (longitud del resultado sin incluir `\0`).
+ *
+ * @return Un puntero a un arreglo dinámico de caracteres (unsigned char*)
+ *         que contiene el texto descomprimido terminado en `\0`.
+ *         El llamador es responsable de liberar esta memoria con `delete[]`.
+ * @note
+ * - El diccionario se maneja con índices crecientes.
+ * - La función imprime mensajes de depuración por consola (`cout` y `cerr`).
+ * - Si la reconstrucción genera menos caracteres de los esperados,
+ *   se muestra una advertencia.
+ */
+unsigned char* descompresionLZ78(unsigned char* data, int size, int& total) {
     cout << "Dentro de funcion descompresion:\n";
 
+    // Diccionario para almacenar las cadenas
     unsigned char** diccionario = new unsigned char*[size];
     int* longitudes = new int[size];
     int tamDic = 0;
     total = 0;
     int numero = 0;
 
-    // Primer pasada: calcular tamaño total
+    // Primera pasada: calcular tamaño total
     for (int i = 0; i < size; i++) {
         unsigned char c = data[i];
 
         if (c >= 'a' && c <= 'z') {
-            int len = (numero == 0) ? 1 : longitudes[numero] + 1;
+            // Encontramos una letra minúscula, fin del número
+            cout << "Numero reconstruido: " << numero << ", letra: " << c << "\n";
 
+            int len = (numero == 0) ? 1 : longitudes[numero] + 1;
             longitudes[++tamDic] = len;
             total += len;
 
             cout << "Par (" << numero << ", " << c << ") -> longitud = "
-                 << len << "  total = " << total << endl;
+                 << len << ", total acumulado = " << total << endl;
+            numero = 0;  // Reiniciar para el siguiente número
 
-            numero = 0;
         } else {
-            numero = numero * 256 + (int)c;
+            // Es parte del número, acumular según el valor ASCII del byte
+            int valorByte = (int)c;
+
+            // Determinar la base según el rango del byte actual
+            int base;
+            if (valorByte < 10) {
+                base = 10;
+            } else if (valorByte < 100) {
+                base = 100;
+            } else if (valorByte < 1000) {
+                base = 1000;
+            } else {
+                base = 1000;  // Máximo para 3 dígitos
+            }
+
+            numero = numero * base + valorByte;
+            cout << "Acumulando byte ASCII " << valorByte << " (char: '"
+                 << (char)c << "'), numero actual: " << numero
+                 << ", base usada: " << base << endl;
         }
     }
 
     cout << "Tamaño total descomprimido: " << total << endl;
 
+    // Reservar memoria para el resultado
     unsigned char* descomprimido = new unsigned char[total + 1];
     int pos = 0;
 
-    // Segunda pasada: reconstruir cadenas
+    // Segunda pasada: reconstruir las cadenas
     tamDic = 0;
     numero = 0;
+
     for (int i = 0; i < size; i++) {
         unsigned char c = data[i];
 
         if (c >= 'a' && c <= 'z') {
+            // Fin del número, crear la cadena
             unsigned char* nuevaCadena;
             int len;
 
             if (numero == 0) {
+                // Caso base: solo el carácter
                 len = 1;
                 nuevaCadena = new unsigned char[1];
                 nuevaCadena[0] = c;
             } else {
-                len = longitudes[numero] + 1;
-                nuevaCadena = new unsigned char[len];
-                for (int j = 0; j < longitudes[numero]; j++) {
-                    nuevaCadena[j] = diccionario[numero][j];
+                // Concatenar cadena del diccionario + nuevo carácter
+                if (numero > tamDic) {
+                    cerr << "Error: referencia a entrada " << numero
+                         << " que no existe en diccionario (tamaño: " << tamDic << ")" << endl;
+                    // Manejo de error: tratar como caso base
+                    len = 1;
+                    nuevaCadena = new unsigned char[1];
+                    nuevaCadena[0] = c;
+                } else {
+                    len = longitudes[numero] + 1;
+                    nuevaCadena = new unsigned char[len];
+
+                    // Copiar la cadena del diccionario
+                    for (int j = 0; j < longitudes[numero]; j++) {
+                        nuevaCadena[j] = diccionario[numero][j];
+                    }
+                    nuevaCadena[len - 1] = c;  // Agregar el nuevo carácter
                 }
-                nuevaCadena[len - 1] = c;
             }
 
+            // Agregar al diccionario
             diccionario[++tamDic] = nuevaCadena;
 
-            // Copia manual al buffer de salida
+            // Copiar al buffer de salida
             for (int j = 0; j < len; j++) {
-                descomprimido[pos + j] = nuevaCadena[j];
+                if (pos + j < total) {  // Verificación de límites
+                    descomprimido[pos + j] = nuevaCadena[j];
+                }
             }
             pos += len;
+            numero = 0;  // Reiniciar para el siguiente número
 
-            numero = 0;
         } else {
-            numero = numero * 256 + (int)c;
+            // Acumular bytes para formar el número
+            int valorByte = (int)c;
+
+            // Determinar la base según el rango del byte actual
+            int base;
+            if (valorByte < 10) {
+                base = 10;
+            } else if (valorByte < 100) {
+                base = 100;
+            } else if (valorByte < 1000) {
+                base = 1000;
+            } else {
+                base = 1000;
+            }
+
+            numero = numero * base + valorByte;
         }
     }
 
-    // Seguridad: verificar que no se salió de rango
+    // Verificación de seguridad
     if (pos != total) {
         cerr << "Advertencia: pos=" << pos << " pero total=" << total << endl;
     }
@@ -85,21 +178,29 @@ unsigned char* descompresionLZ78(unsigned char* data, int size,int& total) {
 
     // Agregar terminador de cadena
     descomprimido[total] = '\0';
-
     return descomprimido;
 }
 
+
+
+
 /**
- * @brief descomprime un arreglo previamente comprimido usando elalgoritmo RLE (Run-Length Encoding).
+ * @brief Descomprime un arreglo previamente comprimido usando el algoritmo RLE (Run-Length Encoding).
  *
- * este algoritmo multiplica un caracter A de una secuencia de estos por la cantidad n que sea
- * mencionada en el mismo.
- * Ejemplo: "4A3B2C1D2A" -> "AAAABBBCCDAA".
+ * Este algoritmo interpreta una secuencia en la forma "nX", donde "n" es un número
+ * que indica cuántas veces se repite el carácter "X".
+ * Por ejemplo: `"4A3B2C1D2A"` -> `"AAAABBBCCDAA"`.
  *
- * @param arreglo puntero a un arreglo de caracteres previamente comprimido.
- * @param longitud cantidad de caracteres del arreglo de entrada.
- * @return unsigned char* Puntero al texto descomprimido (dinámico, debe liberarse con delete[]).
-*/
+ * @param entrada Puntero al arreglo de caracteres comprimidos.
+ * @param size    Cantidad de caracteres del arreglo de entrada.
+ * @param total   Referencia donde se almacena la longitud del texto descomprimido.
+ * @return unsigned char* Puntero al texto descomprimido (dinámico, debe liberarse con `delete[]`).
+ *
+ * @note
+ * - La función calcula primero la longitud final para reservar memoria suficiente.
+ * - Se asume que los números son enteros positivos y de cualquier cantidad de dígitos.
+ * - La cadena resultante se termina con '\0'.
+ */
 unsigned char* descompresionRLE(unsigned char* entrada,int size, int& total){
 
     // Calcular la longitud aproximada de la cadena descomprimida
