@@ -70,7 +70,6 @@ int compresionRlE(unsigned char* arreglo, int longitud);
  * @return
  */
 unsigned char* descompresionLZ78(unsigned char* data,int size,int& total);
-=======
 
 /**
  * @brief descomprime un arreglo previamente comprimido usando elalgoritmo RLE (Run-Length Encoding).
@@ -85,5 +84,4 @@ unsigned char* descompresionLZ78(unsigned char* data,int size,int& total);
 */
 unsigned char* descompresionRLE(unsigned char* entrada);
 
->>>>>>> Stashed changes
 #endif // FUNCIONES_H

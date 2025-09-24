@@ -104,25 +104,34 @@ unsigned char* descompresionRLE(unsigned char* entrada, int size){
 
     // Calcular la longitud aproximada de la cadena descomprimida
     int longitudFinal = 0;
-    for (int i = 0; entrada[i] != '\0'; i += 2) {
-        int repeticiones = entrada[i] - '0'; // convertir char número a int
-        longitudFinal += repeticiones;
+    int numero = 0;
+    for (int i = 0; entrada[i] != '\0'; i ++) {
+        if (entrada[i] >= '0' && entrada[i] <= '9'){
+            numero = numero * 10 + (entrada[i] - '0');
+        }
+        else {
+            longitudFinal += numero;
+            numero = 0;
+        }
     }
-
     //Crear arreglo dinámico con la longitud suficiente (+1 para '\0')
     unsigned char* descomprimido = new unsigned char[longitudFinal + 1];
 
     //realizar la descompresión
     int pos = 0;
-    for (int i = 0; entrada[i] != '\0'; i += 2) {
-        int repeticiones = entrada[i] - '0';
-        char caracter = entrada[i + 1];
-
-        for (int j = 0; j < repeticiones; j++) {
-            entrada[pos++] = caracter;
+    int repeticiones = 0;
+    for (int i = 0; entrada[i] != '\0'; i ++) {
+        if (entrada[i] >= '0' && entrada[i] <= '9'){
+            repeticiones = repeticiones * 10 + (entrada[i] - '0');
+        }
+        else{
+            for (int j = 0; j < repeticiones; j++){
+                descomprimido[pos] = entrada[i];
+                pos++;
+            }
+            repeticiones = 0;
         }
     }
-
     //Terminar la cadena con '\0'
     descomprimido[pos] = '\0';
 
