@@ -1,46 +1,92 @@
 #include <iostream>
 
 using namespace std;
-unsigned char* descompresionLZ78(unsigned char* data, int size) {
+unsigned char* descompresionLZ78(unsigned char* data, int size,int& total) {
     cout << "Dentro de funcion descompresion:\n";
 
-    int* longitudes = new int[size];  // arreglo dinámico para longitudes
-    int tamDic = 0;                   // tamaño lógico del diccionario
-    int total = 0;                    // tamaño descomprimido
-    int numero = 0;                   // acumulador para el índice
+    unsigned char** diccionario = new unsigned char*[size];
+    int* longitudes = new int[size];
+    int tamDic = 0;
+    total = 0;
+    int numero = 0;
 
+    // Primer pasada: calcular tamaño total
     for (int i = 0; i < size; i++) {
         unsigned char c = data[i];
 
         if (c >= 'a' && c <= 'z') {
-            // calculamos longitud de la nueva cadena
-            int len;
-            if (numero == 0) {
-                len = 1; // cadena nueva de una sola letra
-            } else {
-                len = longitudes[numero] + 1;
-            }
+            int len = (numero == 0) ? 1 : longitudes[numero] + 1;
 
-            // guardamos en diccionario
             longitudes[++tamDic] = len;
-
-            // sumamos al total descomprimido
             total += len;
 
             cout << "Par (" << numero << ", " << c << ") -> longitud = "
                  << len << "  total = " << total << endl;
 
-            numero = 0; // reiniciar acumulador
+            numero = 0;
         } else {
-            // reconstruir numero en base 256
             numero = numero * 256 + (int)c;
         }
     }
 
     cout << "Tamaño total descomprimido: " << total << endl;
 
-    delete[] longitudes;  // liberar memoria
-    return nullptr;
+    unsigned char* descomprimido = new unsigned char[total + 1];
+    int pos = 0;
+
+    // Segunda pasada: reconstruir cadenas
+    tamDic = 0;
+    numero = 0;
+    for (int i = 0; i < size; i++) {
+        unsigned char c = data[i];
+
+        if (c >= 'a' && c <= 'z') {
+            unsigned char* nuevaCadena;
+            int len;
+
+            if (numero == 0) {
+                len = 1;
+                nuevaCadena = new unsigned char[1];
+                nuevaCadena[0] = c;
+            } else {
+                len = longitudes[numero] + 1;
+                nuevaCadena = new unsigned char[len];
+                for (int j = 0; j < longitudes[numero]; j++) {
+                    nuevaCadena[j] = diccionario[numero][j];
+                }
+                nuevaCadena[len - 1] = c;
+            }
+
+            diccionario[++tamDic] = nuevaCadena;
+
+            // Copia manual al buffer de salida
+            for (int j = 0; j < len; j++) {
+                descomprimido[pos + j] = nuevaCadena[j];
+            }
+            pos += len;
+
+            numero = 0;
+        } else {
+            numero = numero * 256 + (int)c;
+        }
+    }
+
+    // Seguridad: verificar que no se salió de rango
+    if (pos != total) {
+        cerr << "Advertencia: pos=" << pos << " pero total=" << total << endl;
+    }
+
+    // Liberar memoria del diccionario
+    for (int i = 1; i <= tamDic; i++) {
+        delete[] diccionario[i];
+    }
+    delete[] diccionario;
+    delete[] longitudes;
+
+    // Agregar terminador de cadena
+    descomprimido[total] = '\0';
+
+    return descomprimido;
 }
 
 /**

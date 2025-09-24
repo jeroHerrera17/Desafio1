@@ -63,7 +63,9 @@ int main() {
         // Rotar bits a la derecha (ejemplo: 3 posiciones)
         RotarDerecha(size, encriptacion, 3);
         mostrarContenido("Contenido despues de rotacion:", encriptacion, size);
-        unsigned char* descomprimido=descompresionLZ78(encriptacion, size);
+        int total;
+        unsigned char* descomprimido=descompresionLZ78(encriptacion, size,total);
+        mostrarContenido("Contenido despues descompresión", descomprimido,total);
         // Liberar memoria asignada
         delete[] encriptacion;
     } else {

@@ -62,5 +62,5 @@ void RotarIzquierda(int tamaño, unsigned char* texto, int n);
  * @return int Siempre devuelve 0 en esta versión (se podría cambiar para retornar la longitud comprimida).
  */
 int compresionRlE(unsigned char* arreglo, int longitud);
-unsigned char* descompresionLZ78(unsigned char* data,int size);
+unsigned char* descompresionLZ78(unsigned char* data,int size,int& total);
 #endif // FUNCIONES_H
