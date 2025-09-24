@@ -82,6 +82,6 @@ unsigned char* descompresionLZ78(unsigned char* data,int size,int& total);
  * @param longitud cantidad de caracteres del arreglo de entrada.
  * @return unsigned char* Puntero al texto descomprimido (dinámico, debe liberarse con delete[]).
 */
-unsigned char* descompresionRLE(unsigned char* entrada);
+unsigned char* descompresionRLE(unsigned char* entrada,int size, int& total);
 
 #endif // FUNCIONES_H
