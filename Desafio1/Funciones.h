@@ -62,5 +62,28 @@ void RotarIzquierda(int tamaño, unsigned char* texto, int n);
  * @return int Siempre devuelve 0 en esta versión (se podría cambiar para retornar la longitud comprimida).
  */
 int compresionRlE(unsigned char* arreglo, int longitud);
+/**
+ * @brief descompresionLZ78
+ * @param data
+ * @param size
+ * @param total
+ * @return
+ */
 unsigned char* descompresionLZ78(unsigned char* data,int size,int& total);
+=======
+
+/**
+ * @brief descomprime un arreglo previamente comprimido usando elalgoritmo RLE (Run-Length Encoding).
+ *
+ * este algoritmo multiplica un caracter A de una secuencia de estos por la cantidad n que sea
+ * mencionada en el mismo.
+ * Ejemplo: "4A3B2C1D2A" -> "AAAABBBCCDAA".
+ *
+ * @param arreglo puntero a un arreglo de caracteres previamente comprimido.
+ * @param longitud cantidad de caracteres del arreglo de entrada.
+ * @return unsigned char* Puntero al texto descomprimido (dinámico, debe liberarse con delete[]).
+*/
+unsigned char* descompresionRLE(unsigned char* entrada);
+
+>>>>>>> Stashed changes
 #endif // FUNCIONES_H

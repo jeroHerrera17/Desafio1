@@ -100,39 +100,34 @@ unsigned char* descompresionLZ78(unsigned char* data, int size,int& total) {
  * @param longitud cantidad de caracteres del arreglo de entrada.
  * @return unsigned char* Puntero al texto descomprimido (dinámico, debe liberarse con delete[]).
 */
-unsigned char* descompresionRLE(unsigned char* entrada){
-    int capacidad = 100; //la capcidad inicial de la salida, esta podra ir variando dependiendo si se necesite
-    unsigned char* arregloDescomprimido = new unsigned char[capacidad];
-    int pos = 0; //posicion inicial del arreglo
-    int n = 0; //acumulador
+unsigned char* descompresionRLE(unsigned char* entrada, int size){
 
-    for(int i = 0; entrada[i] != '\0'; i++){
-        char c = entrada[i];
-        if(c >= '0' && c <= '9'){
-            n = n * 10 +(c - '0');
-        }
-        else{
-            //en caso de acabarse la capacidad de almacenamiento esta se actualizara
-            while(pos + n >= capacidad){
-                capacidad *= 2;
-                unsigned char* temp = new unsigned char[capacidad];
-                for (int k = 0; k < pos; k++) temp[k] = arregloDescomprimido[k];
-                delete[] arregloDescomprimido;
-                arregloDescomprimido = temp;
-            }
-            // agregar el carácter repetido n-veces
-            for (int j = 0; j < n; j++) {
-                arregloDescomprimido[pos++] = c;
-            }
+    // Calcular la longitud aproximada de la cadena descomprimida
+    int longitudFinal = 0;
+    for (int i = 0; entrada[i] != '\0'; i += 2) {
+        int repeticiones = entrada[i] - '0'; // convertir char número a int
+        longitudFinal += repeticiones;
+    }
 
-        n = 0; // reiniciar para el próximo bloque
+    //Crear arreglo dinámico con la longitud suficiente (+1 para '\0')
+    unsigned char* descomprimido = new unsigned char[longitudFinal + 1];
+
+    //realizar la descompresión
+    int pos = 0;
+    for (int i = 0; entrada[i] != '\0'; i += 2) {
+        int repeticiones = entrada[i] - '0';
+        char caracter = entrada[i + 1];
+
+        for (int j = 0; j < repeticiones; j++) {
+            entrada[pos++] = caracter;
         }
     }
 
-    arregloDescomprimido[pos] = '\0';
-    return arregloDescomprimido;
-}
+    //Terminar la cadena con '\0'
+    descomprimido[pos] = '\0';
 
+    return descomprimido;
+}
 
 
 
