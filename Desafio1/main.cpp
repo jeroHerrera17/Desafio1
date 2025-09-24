@@ -22,7 +22,7 @@ void mostrarContenido(const string& titulo, unsigned char* contenido, int size) 
         if ((contenido[i] >= 'a'&& contenido[i] <= 'z')||(contenido[i] >= 'A'&& contenido[i] <= 'Z') ) {
             cout << contenido[i];  // solo se imprimen caracteres que son letras
         } else {
-          cout<<(int)contenido[i];  //caracteres diferentes de letras se imprimen como enteros
+          cout<<contenido[i];//cout<<(int)contenido[i];  //caracteres diferentes de letras se imprimen como enteros
         }
     }
     cout << endl << endl;
@@ -63,7 +63,7 @@ int main() {
         // Rotar bits a la derecha (ejemplo: 3 posiciones)
         RotarDerecha(size, encriptacion, 3);
         mostrarContenido("Contenido despues de rotacion:", encriptacion, size);
-
+        unsigned char* descomprimido=descompresionLZ78(encriptacion, size);
         // Liberar memoria asignada
         delete[] encriptacion;
     } else {

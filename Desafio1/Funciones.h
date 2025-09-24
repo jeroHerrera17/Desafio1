@@ -49,7 +49,7 @@ void RotarDerecha(int tamaño, unsigned char* texto, int n);
  * @param n Número de posiciones a rotar (0-7).
  */
 void RotarIzquierda(int tamaño, unsigned char* texto, int n);
-/*
+/**
  * @brief Comprime un arreglo de caracteres usando el algoritmo RLE (Run-Length Encoding).
  *
  * Este algoritmo reemplaza secuencias consecutivas de caracteres repetidos por
@@ -62,5 +62,5 @@ void RotarIzquierda(int tamaño, unsigned char* texto, int n);
  * @return int Siempre devuelve 0 en esta versión (se podría cambiar para retornar la longitud comprimida).
  */
 int compresionRlE(unsigned char* arreglo, int longitud);
-
+unsigned char* descompresionLZ78(unsigned char* data,int size);
 #endif // FUNCIONES_H
