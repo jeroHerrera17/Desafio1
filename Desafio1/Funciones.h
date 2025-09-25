@@ -101,4 +101,17 @@ unsigned char* descompresionLZ78(unsigned char* data,int size,int& total);
 */
 unsigned char* descompresionRLE(unsigned char* entrada,int size, int& total);
 
+/**
+ * @brief Muestra el contenido de un arreglo de bytes como texto imprimible.
+ *
+ * Esta función recorre un arreglo de bytes y muestra en consola
+ * los caracteres ASCII que son letras como char y el resto de caracteres como enteros
+ * Los caracteres no imprimibles son omitidos.
+ *
+ * @param titulo Texto que se mostrará como encabezado antes del contenido.
+ * @param contenido Puntero al arreglo de bytes a mostrar.
+ * @param size Número de bytes en el arreglo.
+ */
+void mostrarContenido(const string& titulo, unsigned char* contenido, int size);
+void BuscarParametros(unsigned char* data,int&nbits,int&claveK,int sizeEncriptado,int sizePista,unsigned char*pista);
 #endif // FUNCIONES_H

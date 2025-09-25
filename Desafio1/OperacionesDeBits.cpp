@@ -15,7 +15,7 @@ using namespace std;
 
 
 void DoXOR(unsigned char* texto, unsigned char clave, int tamaño) {
-    cout<<"Dentro de la funcion xor"<<endl;
+
     for (int i = 0; i < tamaño; ++i) {
         texto[i] ^= clave;
     }

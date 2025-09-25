@@ -69,3 +69,27 @@ unsigned char* leerArchivoACharArray(const string& rutaArchivo, int& size) {
     archivo.close();
     return buffer;
 }
+
+/**
+ * @brief Muestra el contenido de un arreglo de bytes como texto imprimible.
+ *
+ * Esta función recorre un arreglo de bytes y muestra en consola
+ * los caracteres ASCII que son letras como char y el resto de caracteres como enteros
+ * Los caracteres no imprimibles son omitidos.
+ *
+ * @param titulo Texto que se mostrará como encabezado antes del contenido.
+ * @param contenido Puntero al arreglo de bytes a mostrar.
+ * @param size Número de bytes en el arreglo.
+ */
+void mostrarContenido(const string& titulo, unsigned char* contenido, int size) {
+    cout << titulo << endl;
+
+    for (int i = 0; i < size; ++i) {
+        if ((contenido[i] >= 'a'&& contenido[i] <= 'z')||(contenido[i] >= 'A'&& contenido[i] <= 'Z') ) {
+            cout << contenido[i];  // solo se imprimen caracteres que son letras
+        } else {
+            cout<<(int)contenido[i];  //caracteres diferentes de letras se imprimen como enteros
+        }
+    }
+    cout << endl << endl;
+}

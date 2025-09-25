@@ -5,29 +5,6 @@
 
 using namespace std;
 
-/**
- * @brief Muestra el contenido de un arreglo de bytes como texto imprimible.
- *
- * Esta función recorre un arreglo de bytes y muestra en consola
- * los caracteres ASCII que son letras como char y el resto de caracteres como enteros
- * Los caracteres no imprimibles son omitidos.
- *
- * @param titulo Texto que se mostrará como encabezado antes del contenido.
- * @param contenido Puntero al arreglo de bytes a mostrar.
- * @param size Número de bytes en el arreglo.
- */
-void mostrarContenido(const string& titulo, unsigned char* contenido, int size) {
-    cout << titulo << endl;
-
-    for (int i = 0; i < size; ++i) {
-        if ((contenido[i] >= 'a'&& contenido[i] <= 'z')||(contenido[i] >= 'A'&& contenido[i] <= 'Z') ) {
-            cout << contenido[i];  // solo se imprimen caracteres que son letras
-        } else {
-          cout<<contenido[i];//cout<<(int)contenido[i];  //caracteres diferentes de letras se imprimen como enteros
-        }
-    }
-    cout << endl << endl;
-}
 
 /**
  * @brief Punto de entrada principal del programa.
@@ -42,12 +19,19 @@ void mostrarContenido(const string& titulo, unsigned char* contenido, int size) 
  * @return int Código de salida (0 si termina correctamente).
  */
 int main() {
-    string rutaArchivo = "../../Datos/Encriptado2.txt"; ///< Ruta relativa al archivo a leer
-    int size = 0;
-
+    string rutaBase = "../../Datos/";
+        ///< Ruta relativa al archivo a leer
+    int sizeEncriptado = 0;
+    int sizePista=0;
+    //Valor n de rotacion
+    int nBits=0;
+    int claveK=0;
     // Leer el archivo en memoria dinámica
-    unsigned char* encriptacion = leerArchivoACharArray(rutaArchivo, size);
+    unsigned char* encriptacion = leerArchivoACharArray(rutaBase+"encriptado4.txt", sizeEncriptado);
+    unsigned char* pista=leerArchivoACharArray(rutaBase+"pista4.txt", sizePista);
+    BuscarParametros(encriptacion,nBits,claveK,sizeEncriptado,sizePista,pista);
 
+    /*
     if (encriptacion != nullptr) {
         cout << "El archivo tiene " << size << " caracteres." << endl << endl;
 
@@ -65,13 +49,13 @@ int main() {
         RotarDerecha(size, encriptacion, 3);
         mostrarContenido("Contenido despues de rotacion:", encriptacion, size);
         int total;
-        unsigned char* descomprimido=descompresionLZ78(encriptacion, size,total);
-        mostrarContenido("Contenido despues descompresión", descomprimido,total);
+        //unsigned char* descomprimido=descompresionLZ78(encriptacion, size,total);
+        //mostrarContenido("Contenido despues descompresión", descomprimido,total);
         // Liberar memoria asignada
         delete[] encriptacion;
     } else {
         cerr << "Error al leer el archivo." << endl;
     }
-
+    */
     return 0;
 }

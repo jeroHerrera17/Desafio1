@@ -39,38 +39,48 @@ using namespace std;
  * - Si la reconstrucción genera menos caracteres de los esperados,
  *   se muestra una advertencia.
  */
+
 unsigned char* descompresionLZ78(unsigned char* data, int size, int& total) {
-    cout << "Dentro de funcion descompresion:\n";
+    cout << "Dentro de funcion descompresion LZ78:\n";
+
+
+    //Calculo de tamaño descomprimido
 
     // Diccionario para almacenar las cadenas
     unsigned char** diccionario = new unsigned char*[size];
     int* longitudes = new int[size];
-    int tamDic = 0;
+    int posDic = 0;
     total = 0;
     int numero = 0;
 
     // Primera pasada: calcular tamaño total
     for (int i = 0; i < size; i++) {
         unsigned char c = data[i];
-
+        numero%=1000;
         if (c >= 'a' && c <= 'z') {
+
             // Encontramos una letra minúscula, fin del número
-            cout << "Numero reconstruido: " << numero << ", letra: " << c << "\n";
+            //cout << "Numero reconstruido: " << numero << ", letra: " << c << "\n";
 
             int len = (numero == 0) ? 1 : longitudes[numero] + 1;
-            longitudes[++tamDic] = len;
+            ++posDic;
+            longitudes[posDic] = len;
             total += len;
 
-            cout << "Par (" << numero << ", " << c << ") -> longitud = "
-                 << len << ", total acumulado = " << total << endl;
+            //cout << "Par (" << numero << ", " << c << ") -> longitud = "
+              //   << len << ", total acumulado = " << total <<"\n\n\n"<< endl;
             numero = 0;  // Reiniciar para el siguiente número
 
         } else {
-            // Es parte del número, acumular según el valor ASCII del byte
+            int base;
             int valorByte = (int)c;
 
+
+            // Es parte del número, acumular según el valor ASCII del byte
+
+
             // Determinar la base según el rango del byte actual
-            int base;
+
             if (valorByte < 10) {
                 base = 10;
             } else if (valorByte < 100) {
@@ -81,27 +91,29 @@ unsigned char* descompresionLZ78(unsigned char* data, int size, int& total) {
                 base = 1000;  // Máximo para 3 dígitos
             }
 
+
             numero = numero * base + valorByte;
-            cout << "Acumulando byte ASCII " << valorByte << " (char: '"
-                 << (char)c << "'), numero actual: " << numero
-                 << ", base usada: " << base << endl;
+            //cout << "Acumulando byte ASCII " << valorByte << " (char: '"
+               //  << (char)c << "'), numero actual: " << numero
+                 //<< ", base usada: " << base << endl;
         }
     }
 
-    cout << "Tamaño total descomprimido: " << total << endl;
+    //cout << "Tamanioo total descomprimido: " << total << endl;
 
     // Reservar memoria para el resultado
     unsigned char* descomprimido = new unsigned char[total + 1];
     int pos = 0;
 
     // Segunda pasada: reconstruir las cadenas
-    tamDic = 0;
+    posDic = 0;
     numero = 0;
 
     for (int i = 0; i < size; i++) {
         unsigned char c = data[i];
-
+        numero%=1000;
         if (c >= 'a' && c <= 'z') {
+
             // Fin del número, crear la cadena
             unsigned char* nuevaCadena;
             int len;
@@ -113,9 +125,9 @@ unsigned char* descompresionLZ78(unsigned char* data, int size, int& total) {
                 nuevaCadena[0] = c;
             } else {
                 // Concatenar cadena del diccionario + nuevo carácter
-                if (numero > tamDic) {
+                if (numero > posDic) {
                     cerr << "Error: referencia a entrada " << numero
-                         << " que no existe en diccionario (tamaño: " << tamDic << ")" << endl;
+                         << " que no existe en diccionario (tamaño: " << posDic << ")" << endl;
                     // Manejo de error: tratar como caso base
                     len = 1;
                     nuevaCadena = new unsigned char[1];
@@ -133,7 +145,8 @@ unsigned char* descompresionLZ78(unsigned char* data, int size, int& total) {
             }
 
             // Agregar al diccionario
-            diccionario[++tamDic] = nuevaCadena;
+            ++posDic;
+            diccionario[posDic] = nuevaCadena;
 
             // Copiar al buffer de salida
             for (int j = 0; j < len; j++) {
@@ -170,7 +183,7 @@ unsigned char* descompresionLZ78(unsigned char* data, int size, int& total) {
     }
 
     // Liberar memoria del diccionario
-    for (int i = 1; i <= tamDic; i++) {
+    for (int i = 1; i <= posDic; i++) {
         delete[] diccionario[i];
     }
     delete[] diccionario;
@@ -178,6 +191,7 @@ unsigned char* descompresionLZ78(unsigned char* data, int size, int& total) {
 
     // Agregar terminador de cadena
     descomprimido[total] = '\0';
+
     return descomprimido;
 }
 

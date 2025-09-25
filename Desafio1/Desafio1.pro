@@ -4,9 +4,10 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        BusquedaParametros.cpp \
         CompresionDescompresion.cpp \
-        ManipulacionArchivos.cpp \
-        ManipulacionBits.cpp \
+        ManipulacionTexto.cpp \
+        OperacionesDeBits.cpp \
         main.cpp
 
 HEADERS += \
