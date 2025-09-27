@@ -95,9 +95,9 @@ unsigned char* descompresionLZ78(unsigned char* data,int size,int& total);
  * mencionada en el mismo.
  * Ejemplo: "4A3B2C1D2A" -> "AAAABBBCCDAA".
  *
- * @param arreglo puntero a un arreglo de caracteres previamente comprimido.
- * @param longitud cantidad de caracteres del arreglo de entrada.
- * @return unsigned char* Puntero al texto descomprimido (dinámico, debe liberarse con delete[]).
+ * @param entrada puntero a un arreglo de caracteres previamente comprimido.
+ * @param size cantidad de caracteres del arreglo de entrada.
+ * @return total Tamaño total del arreglo descomprimido.
 */
 unsigned char* descompresionRLE(unsigned char* entrada,int size, int& total);
 

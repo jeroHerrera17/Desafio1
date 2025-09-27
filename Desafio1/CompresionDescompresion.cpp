@@ -216,39 +216,29 @@ unsigned char* descompresionLZ78(unsigned char* data, int size, int& total) {
  * - La cadena resultante se termina con '\0'.
  */
 unsigned char* descompresionRLE(unsigned char* entrada,int size, int& total){
-
-    // Calcular la longitud aproximada de la cadena descomprimida
     int longitudFinal = 0;
     int numero = 0;
-    for (int i = 0; i < size; i ++) {
-        if (int(entrada[i]) >= 0 && int(entrada[i]) <= 9){
-            numero = numero * 10 + (int(entrada[i]));
-        }
-        else {
-            longitudFinal += numero;
-            numero = 0;
-        }
+    for (int i = 0; i < size; i += 3) {
+        numero = int(entrada[i+1]);
+        longitudFinal += numero;
     }
     //Crear arreglo dinámico con la longitud suficiente (+1 para '\0')
     unsigned char* descomprimido = new unsigned char[longitudFinal + 1];
     //realizar la descompresión
     int pos = 0;
     int repeticiones = 0;
-    for (int i = 0; i < size; i ++) {
-        if (int(entrada[i]) >= 0 && int(entrada[i]) <= 9){
-            repeticiones = repeticiones * 10 + (int(entrada[i]));
+    for (int i = 0; i < size; i += 3) {
+        repeticiones = int(entrada[i+1]);
+        for(int j = 0; j < repeticiones; j++){
+            descomprimido[pos] = entrada[i + 2];
+            pos++;
         }
-        else{
-            for (int j = 0; j < repeticiones; j++){
-                descomprimido[pos] = entrada[i];
-                pos++;
-            }
-            repeticiones = 0;
-        }
+        repeticiones = 0;
     }
     //Terminar la cadena con '\0'
     descomprimido[pos] = '\0';
     total = longitudFinal;
+
 
     return descomprimido;
 }
