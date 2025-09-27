@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <iomanip>
 #include "Funciones.h"
 
 using namespace std;
@@ -19,17 +18,43 @@ using namespace std;
  * @return int Código de salida (0 si termina correctamente).
  */
 int main() {
-    string rutaBase = "../../Datos/";
-        ///< Ruta relativa al archivo a leer
+
     int sizeEncriptado = 0;
-    int sizePista=0;
-    //Valor n de rotacion
-    int nBits=0;
-    int claveK=0;
-    // Leer el archivo en memoria dinámica
-    unsigned char* encriptacion = leerArchivoACharArray(rutaBase+"encriptado4.txt", sizeEncriptado);
-    unsigned char* pista=leerArchivoACharArray(rutaBase+"pista4.txt", sizePista);
-    BuscarParametros(encriptacion,nBits,claveK,sizeEncriptado,sizePista,pista);
+    int sizePista = 0;
+    int nBits = 0;
+    int claveK = 0;
+    int nArchivos=4;
+    int total=0;
+    // Buffers para las rutas completas
+    char archivoEncriptado[] = "../../Datos/encriptado0.txt";
+    char archivoPista[]      = "../../Datos/pista0.txt";
+    char archivoModificado[]      = "../../Datos/modificado0.txt";
+
+    for (int i = 1; i <= nArchivos; i++) {  // supongamos que tenemos 5 archivos
+        // Cambiar solo el dígito en la ruta
+        archivoEncriptado[sizeof("../../Datos/encriptado") - 1] = '0' + i;
+        archivoPista[sizeof("../../Datos/pista") - 1] = '0' + i;
+        archivoModificado[sizeof("../../Datos/modificado") - 1] = '0' + i;
+        //solo para trabajar con depuracion luego modificar en la practica
+
+        cout << "Archivo encriptado: " << archivoEncriptado << endl;
+        cout << "Archivo pista     : " << archivoPista << endl;
+        unsigned char* enc=leerArchivoACharArray(archivoEncriptado,sizeEncriptado);
+        unsigned char* pista=leerArchivoACharArray(archivoPista,sizePista);
+        BuscarParametros( enc,  nBits,  claveK,  sizeEncriptado,  sizePista,  pista);
+
+        // claveK=0x5A;
+        // nBits=3;
+        // DoXOR(enc, claveK, sizeEncriptado);
+        // cout<<"\n\nDespues de XOR \n\n\n"<<endl;
+        // mostrarContenido(enc,sizeEncriptado);
+        // RotarDerecha(sizeEncriptado, enc, nBits);
+        // mostrarContenido(enc,sizeEncriptado);
+        // unsigned char* descomprimido = descompresionLZ78(enc, sizeEncriptado, total);
+        // mostrarContenido(descomprimido,total);
+
+
+    }
 
     /*
     if (encriptacion != nullptr) {
@@ -58,4 +83,5 @@ int main() {
     }
     */
     return 0;
+
 }

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <string>
 using namespace std;
 
 /**
@@ -10,12 +9,12 @@ using namespace std;
  * de un arreglo de bytes. Si el archivo no puede abrirse o crearse,
  * muestra un mensaje de error y devuelve false.
  *
- * @param rutaArchivo Ruta del archivo a crear o sobrescribir.
+ * @param rutaArchivo Ruta del archivo a crear o sobrescribir (cadena tipo C).
  * @param texto Puntero al arreglo de bytes a escribir.
  * @param size Número de bytes a escribir en el archivo.
  * @return true si el archivo se creó y escribió correctamente, false en caso de error.
  */
-bool crearArchivoConTexto(const string& rutaArchivo, unsigned char* texto, int size) {
+bool crearArchivoConTexto(const char* rutaArchivo, unsigned char* texto, int size) {
     ofstream archivo(rutaArchivo, ios::binary);
     if (!archivo.is_open()) {
         cerr << "No se pudo crear o abrir el archivo." << endl;
@@ -40,11 +39,11 @@ bool crearArchivoConTexto(const string& rutaArchivo, unsigned char* texto, int s
  * para permitir su impresión directa como string. El usuario es responsable
  * de liberar la memoria con `delete[]`.
  *
- * @param rutaArchivo Ruta del archivo a leer.
+ * @param rutaArchivo Ruta del archivo a leer (cadena tipo C).
  * @param size Referencia donde se almacenará el tamaño del archivo leído.
  * @return unsigned char* Puntero al contenido del archivo, o nullptr si ocurre un error.
  */
-unsigned char* leerArchivoACharArray(const string& rutaArchivo, int& size) {
+unsigned char* leerArchivoACharArray(const char* rutaArchivo, int& size) {
     ifstream archivo(rutaArchivo, ios::binary);
     if (!archivo.is_open()) {
         cerr << "No se pudo abrir el archivo." << endl;
@@ -74,21 +73,21 @@ unsigned char* leerArchivoACharArray(const string& rutaArchivo, int& size) {
  * @brief Muestra el contenido de un arreglo de bytes como texto imprimible.
  *
  * Esta función recorre un arreglo de bytes y muestra en consola
- * los caracteres ASCII que son letras como char y el resto de caracteres como enteros
- * Los caracteres no imprimibles son omitidos.
+ * los caracteres ASCII que son letras como char y el resto de caracteres como enteros.
  *
- * @param titulo Texto que se mostrará como encabezado antes del contenido.
+ * @param titulo Texto que se mostrará como encabezado antes del contenido (cadena tipo C).
  * @param contenido Puntero al arreglo de bytes a mostrar.
  * @param size Número de bytes en el arreglo.
  */
-void mostrarContenido(const string& titulo, unsigned char* contenido, int size) {
-    cout << titulo << endl;
+void mostrarContenido( unsigned char* contenido, int size) {
+
 
     for (int i = 0; i < size; ++i) {
-        if ((contenido[i] >= 'a'&& contenido[i] <= 'z')||(contenido[i] >= 'A'&& contenido[i] <= 'Z') ) {
+        if (contenido[i] >= 'a' && contenido[i] <= 'z'
+            ) {
             cout << contenido[i];  // solo se imprimen caracteres que son letras
         } else {
-            cout<<(int)contenido[i];  //caracteres diferentes de letras se imprimen como enteros
+            cout << (int)contenido[i];  // caracteres diferentes de letras se imprimen como enteros
         }
     }
     cout << endl << endl;

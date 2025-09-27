@@ -12,7 +12,7 @@ using std::string;
  * @param size Número de bytes a escribir.
  * @return true si se creó/escribió correctamente, false en caso contrario.
  */
-bool crearArchivoConTexto(const string& rutaArchivo, unsigned char* texto, int size);
+bool crearArchivoConTexto(const char* rutaArchivo, unsigned char* texto, int size);
 
 /**
  * @brief Lee un archivo y devuelve su contenido como un arreglo dinámico.
@@ -21,7 +21,7 @@ bool crearArchivoConTexto(const string& rutaArchivo, unsigned char* texto, int s
  * @param size Referencia donde se almacenará el tamaño leído.
  * @return char* Puntero al contenido del archivo (se debe liberar con delete[]).
  */
-unsigned char* leerArchivoACharArray(const string& rutaArchivo, int& size);
+unsigned char* leerArchivoACharArray(const char* rutaArchivo, int& size);
 
 /**
  * @brief Aplica una operación XOR sobre un arreglo de texto.
@@ -108,10 +108,22 @@ unsigned char* descompresionRLE(unsigned char* entrada,int size, int& total);
  * los caracteres ASCII que son letras como char y el resto de caracteres como enteros
  * Los caracteres no imprimibles son omitidos.
  *
- * @param titulo Texto que se mostrará como encabezado antes del contenido.
  * @param contenido Puntero al arreglo de bytes a mostrar.
  * @param size Número de bytes en el arreglo.
  */
-void mostrarContenido(const string& titulo, unsigned char* contenido, int size);
+void mostrarContenido( unsigned char* contenido, int size);
+/**
+ * @brief Intenta descomprimir los datos usando diferentes algoritmos de compresión
+ *        y busca la pista dentro del resultado descomprimido.
+ *
+ * Este procedimiento prueba con RLE (y tiene código comentado para LZ78).
+ * Si la pista se encuentra dentro de la descompresión, retorna `true`.
+ *
+ * @param data Puntero al arreglo de datos comprimidos.
+ * @param size Tamaño en bytes del arreglo de datos comprimidos.
+ * @param pista Puntero al arreglo con la secuencia a buscar.
+ * @param sizePista Tamaño en bytes de la pista.
+ * @return `true` si la pista es encontrada en alguna de las descompresiones, `false` en caso contrario.
+ */
 void BuscarParametros(unsigned char* data,int&nbits,int&claveK,int sizeEncriptado,int sizePista,unsigned char*pista);
 #endif // FUNCIONES_H
