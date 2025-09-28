@@ -1,87 +1,83 @@
+
+/**
+ * @file main.cpp
+ * @brief Programa principal para el procesamiento de archivos encriptados con pistas.
+ *
+ * Este programa lee múltiples archivos encriptados y sus correspondientes archivos
+ * de pista, calcula los parámetros necesarios para su modificación/descifrado,
+ * y genera archivos de salida con los resultados.
+ *
+ * El flujo principal es:
+ * 1. Construcción dinámica de las rutas de entrada/salida.
+ * 2. Lectura de los archivos encriptados y de pistas en memoria.
+ * 3. Llamado a la función de procesamiento (@ref BuscarParametros).
+ * 4. Escritura del archivo modificado.
+ * 5. Liberación de memoria.
+ */
+
 #include <iostream>
 #include <fstream>
-#include "Funciones.h"
+#include "funciones.h"
 
-using namespace std;
-
+    using namespace std;
 
 /**
  * @brief Punto de entrada principal del programa.
  *
- * Este programa realiza el siguiente flujo:
- * 1. Lee un archivo en memoria dinámica.
- * 2. Muestra el contenido original en consola.
- * 3. Aplica una operación XOR con una clave fija (0x5A).
- * 4. Aplica una rotación de bits a la derecha sobre cada byte.
- * 5. Muestra en consola el resultado después de cada transformación.
+ * Procesa secuencialmente un conjunto de archivos encriptados y sus pistas asociadas.
+ * Para cada archivo:
+ * - Construye las rutas de entrada y salida.
+ * - Lee en memoria los datos encriptados y la pista.
+ * - Llama a @ref BuscarParametros para generar un archivo modificado.
+ * - Libera la memoria reservada.
  *
- * @return int Código de salida (0 si termina correctamente).
+ * @return int Código de retorno estándar (0 si la ejecución fue correcta).
+ *
+ * @var sizeEncriptado Tamaño en bytes del archivo encriptado leído en memoria.
+ * @var sizePista      Tamaño en bytes del archivo de pista leído en memoria.
+ * @var nBits          Número de bits deducido del análisis de los archivos.
+ * @var claveK         Clave encontrada a partir de la pista y del encriptado.
+ * @var nArchivos      Número total de archivos a procesar.
+ * @var archivoEncriptado Ruta base del archivo encriptado (se modifica en cada iteración).
+ * @var archivoPista      Ruta base del archivo de pista (se modifica en cada iteración).
+ * @var archivoModificado Ruta base del archivo de salida modificado (se modifica en cada iteración).
  */
 int main() {
-
     int sizeEncriptado = 0;
     int sizePista = 0;
     int nBits = 0;
     int claveK = 0;
-    int nArchivos=4;
-    int total=0;
-    // Buffers para las rutas completas
-    char archivoEncriptado[] = "../../Datos/encriptado0.txt";
-    char archivoPista[]      = "../../Datos/pista0.txt";
-    char archivoModificado[]      = "../../Datos/modificado0.txt";
+    int nArchivos = 4;
 
-    for (int i = 1; i <= nArchivos; i++) {  // supongamos que tenemos 5 archivos
-        // Cambiar solo el dígito en la ruta
-        archivoEncriptado[sizeof("../../Datos/encriptado") - 1] = '0' + i;
+    char archivoEncriptado[] = "../../Datos/Encriptado0.txt";
+    char archivoPista[]      = "../../Datos/pista0.txt";
+    char archivoModificado[] = "../../Datos/modificado0.txt";
+
+    for (int i = 1; i <= nArchivos; i++) {
+        archivoEncriptado[sizeof("../../Datos/Encriptado") - 1] = '0' + i;
         archivoPista[sizeof("../../Datos/pista") - 1] = '0' + i;
         archivoModificado[sizeof("../../Datos/modificado") - 1] = '0' + i;
-        //solo para trabajar con depuracion luego modificar en la practica
 
+        cout << "=== Procesando archivo " << i << " ===" << endl;
         cout << "Archivo encriptado: " << archivoEncriptado << endl;
         cout << "Archivo pista     : " << archivoPista << endl;
-        unsigned char* enc=leerArchivoACharArray(archivoEncriptado,sizeEncriptado);
-        unsigned char* pista=leerArchivoACharArray(archivoPista,sizePista);
-        BuscarParametros( enc,  nBits,  claveK,  sizeEncriptado,  sizePista,  pista);
+        cout << "Archivo salida    : " << archivoModificado << endl;
 
-        // claveK=0x5A;
-        // nBits=3;
-        // DoXOR(enc, claveK, sizeEncriptado);
-        // cout<<"\n\nDespues de XOR \n\n\n"<<endl;
-        // mostrarContenido(enc,sizeEncriptado);
-        // RotarDerecha(sizeEncriptado, enc, nBits);
-        // mostrarContenido(enc,sizeEncriptado);
-        // unsigned char* descomprimido = descompresionLZ78(enc, sizeEncriptado, total);
-        // mostrarContenido(descomprimido,total);
+        unsigned char* enc = leerArchivoACharArray(archivoEncriptado, sizeEncriptado);
+        unsigned char* pista = leerArchivoACharArray(archivoPista, sizePista);
 
+        if (enc != nullptr && pista != nullptr) {
+            BuscarParametros(enc, nBits, claveK, sizeEncriptado, sizePista, pista, archivoModificado);
 
+            delete[] enc;
+            delete[] pista;
+        } else {
+            cout << "Error al leer los archivos para el índice " << i << endl;
+        }
+
+        cout << "=== Fin procesamiento archivo " << i << " ===" << endl << endl;
     }
 
-    /*
-    if (encriptacion != nullptr) {
-        cout << "El archivo tiene " << size << " caracteres." << endl << endl;
-
-        // Mostrar contenido original
-        mostrarContenido("Contenido original:", encriptacion, size);
-
-        // Definir clave XOR
-        unsigned char clave = 0x5A;
-
-        // Aplicar XOR sobre el contenido en memoria
-        DoXOR(encriptacion, clave, size);
-        mostrarContenido("Contenido despues de XOR:", encriptacion, size);
-
-        // Rotar bits a la derecha (ejemplo: 3 posiciones)
-        RotarDerecha(size, encriptacion, 3);
-        mostrarContenido("Contenido despues de rotacion:", encriptacion, size);
-        int total;
-        //unsigned char* descomprimido=descompresionLZ78(encriptacion, size,total);
-        //mostrarContenido("Contenido despues descompresión", descomprimido,total);
-        // Liberar memoria asignada
-        delete[] encriptacion;
-    } else {
-        cerr << "Error al leer el archivo." << endl;
-    }
-    */
     return 0;
-
 }
+

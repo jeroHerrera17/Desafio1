@@ -125,5 +125,5 @@ void mostrarContenido( unsigned char* contenido, int size);
  * @param sizePista Tamaño en bytes de la pista.
  * @return `true` si la pista es encontrada en alguna de las descompresiones, `false` en caso contrario.
  */
-void BuscarParametros(unsigned char* data,int&nbits,int&claveK,int sizeEncriptado,int sizePista,unsigned char*pista);
+void BuscarParametros(unsigned char* data, int& nbits, int& claveK, int sizeEncriptado, int sizePista, unsigned char* pista, const char* rutaArchivoModificado);
 #endif // FUNCIONES_H
