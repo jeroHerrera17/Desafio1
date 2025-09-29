@@ -16,7 +16,7 @@
  */
 
 #include <iostream>
-#include <fstream>
+
 #include "funciones.h"
 
     using namespace std;
@@ -47,8 +47,9 @@ int main() {
     int sizePista = 0;
     int nBits = 0;
     int claveK = 0;
-    int nArchivos = 4;
-
+    int nArchivos;
+    cout<<"Ingrese la cantidad de archivos a procesar: "<<endl;
+    cin>>nArchivos;
     char archivoEncriptado[] = "../../Datos/Encriptado0.txt";
     char archivoPista[]      = "../../Datos/pista0.txt";
     char archivoModificado[] = "../../Datos/modificado0.txt";
@@ -72,7 +73,7 @@ int main() {
             delete[] enc;
             delete[] pista;
         } else {
-            cout << "Error al leer los archivos para el índice " << i << endl;
+            cout << "Error al leer los archivos para el indice " << i << endl;
         }
 
         cout << "=== Fin procesamiento archivo " << i << " ===" << endl << endl;

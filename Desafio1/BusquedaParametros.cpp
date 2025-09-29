@@ -1,10 +1,9 @@
-
 #include <iostream>
-#include "Funciones.h"
-    using namespace std;
+#include "funciones.h"
+using namespace std;
 
 /**
- * @brief   Función para buscar una secuencia dentro de otra usando arreglos.
+ * @brief Funcion para buscar una secuencia dentro de otra usando arreglos
  */
 bool buscarSecuencia(unsigned char* texto, int sizeTexto, unsigned char* pista, int sizePista) {
     if (texto == nullptr || pista == nullptr || sizeTexto < sizePista) {
@@ -27,44 +26,46 @@ bool buscarSecuencia(unsigned char* texto, int sizeTexto, unsigned char* pista, 
 }
 
 /**
- * @brief Intenta descomprimir los datos usando diferentes algoritmos de compresión
- *        y busca la pista dentro del resultado descomprimido.
+ * @brief Funcion para probar descompresion con parametros integrados
  *
- * Este procedimiento prueba con RLE y LZ78 corregidos para el formato de ternas.
- * Si la pista se encuentra dentro de la descompresión, retorna true y guarda el archivo.
- *
- * @param data Puntero al arreglo de datos comprimidos.
- * @param size Tamaño en bytes del arreglo de datos comprimidos.
- * @param pista Puntero al arreglo con la secuencia a buscar.
- * @param sizePista Tamaño en bytes de la pista.
- * @param rutaArchivoModificado Ruta donde guardar el archivo descomprimido.
- * @return true si la pista es encontrada en alguna de las descompresiones, false en caso contrario.
+ * @param data Datos encriptados originales
+ * @param size Tamaño de los datos
+ * @param pista Secuencia a buscar
+ * @param sizePista Tamaño de la pista
+ * @param claveXOR Clave XOR a aplicar
+ * @param rotacionBits Bits de rotacion a aplicar
+ * @param rutaArchivoModificado Ruta donde guardar el resultado exitoso
+ * @return true si encuentra la pista, false en caso contrario
  */
-bool ProbarDescompresion(unsigned char* data, int size, unsigned char* pista, int sizePista, const char* rutaArchivoModificado) {
+bool ProbarDescompresion(unsigned char* data, int size, unsigned char* pista, int sizePista,
+                         unsigned char claveXOR, int rotacionBits, const char* rutaArchivoModificado) {
     if (data == nullptr || pista == nullptr || size <= 0 || sizePista <= 0) {
         return false;
     }
 
-    // Verificar que el tamaño sea múltiplo de 3 para el formato de ternas
-    if (size % 3 != 0) {
-        cout << "Advertencia: El tamaño no es múltiplo de 3 en ProbarDescompresion" << endl;
-    }
-
+    // Probar RLE con desencriptado integrado
     int total_rle = 0;
+    bool esValido_rle = false;
+    unsigned char* descomprimido_rle = descompresionRLE(data, size, claveXOR, rotacionBits,
+                                                        total_rle, esValido_rle);
 
-    // Probar descompresión RLE - adaptada para formato de ternas
-    unsigned char* descomprimido_rle = descompresionRLE(data, size, total_rle);
-    if (descomprimido_rle != nullptr && total_rle > 0) {
+    if (descomprimido_rle != nullptr && esValido_rle && total_rle > 0) {
         if (buscarSecuencia(descomprimido_rle, total_rle, pista, sizePista)) {
-            cout << "¡Pista encontrada con RLE!" << endl;
+            cout << "Pista encontrada con RLE!" << endl;
+            cout << "Clave XOR: " << (int)claveXOR << " (0x" << hex << (int)claveXOR << dec << ")" << endl;
+            cout << "Bits de rotacion: " << rotacionBits << endl;
             cout << "Contenido descomprimido (primeros 100 caracteres):" << endl;
+
             int mostrar = (total_rle > 100) ? 100 : total_rle;
             mostrarContenido(descomprimido_rle, mostrar);
 
-            if (crearArchivoConTexto(rutaArchivoModificado, descomprimido_rle, total_rle)) {
-                cout << "Archivo guardado exitosamente en: " << rutaArchivoModificado << endl;
-            } else {
-                cout << "Error al guardar el archivo en: " << rutaArchivoModificado << endl;
+            // Guardar archivo descomprimido si se proporciona la ruta
+            if (rutaArchivoModificado != nullptr) {
+                if (crearArchivoConTexto(rutaArchivoModificado, descomprimido_rle, total_rle)) {
+                    cout << "Archivo descomprimido guardado en: " << rutaArchivoModificado << endl;
+                } else {
+                    cout << "Error al guardar el archivo descomprimido" << endl;
+                }
             }
 
             delete[] descomprimido_rle;
@@ -73,21 +74,29 @@ bool ProbarDescompresion(unsigned char* data, int size, unsigned char* pista, in
         delete[] descomprimido_rle;
     }
 
+    // Probar LZ78 con desencriptado integrado
     int total_lz78 = 0;
+    bool esValido_lz78 = false;
+    unsigned char* descomprimido_lz78 = descompresionLZ78(data, size, claveXOR, rotacionBits,
+                                                          total_lz78, esValido_lz78);
 
-    // Probar descompresión LZ78 - adaptada para formato de ternas
-    unsigned char* descomprimido_lz78 = descompresionLZ78(data, size, total_lz78);
-    if (descomprimido_lz78 != nullptr && total_lz78 > 0) {
+    if (descomprimido_lz78 != nullptr && esValido_lz78 && total_lz78 > 0) {
         if (buscarSecuencia(descomprimido_lz78, total_lz78, pista, sizePista)) {
-            cout << "¡Pista encontrada con LZ78!" << endl;
+            cout << "Pista encontrada con LZ78!" << endl;
+            cout << "Clave XOR: " << (int)claveXOR << " (0x" << hex << (int)claveXOR << dec << ")" << endl;
+            cout << "Bits de rotacion: " << rotacionBits << endl;
             cout << "Contenido descomprimido (primeros 100 caracteres):" << endl;
+
             int mostrar = (total_lz78 > 100) ? 100 : total_lz78;
             mostrarContenido(descomprimido_lz78, mostrar);
 
-            if (crearArchivoConTexto(rutaArchivoModificado, descomprimido_lz78, total_lz78)) {
-                cout << "Archivo guardado exitosamente en: " << rutaArchivoModificado << endl;
-            } else {
-                cout << "Error al guardar el archivo en: " << rutaArchivoModificado << endl;
+            // Guardar archivo descomprimido si se proporciona la ruta
+            if (rutaArchivoModificado != nullptr) {
+                if (crearArchivoConTexto(rutaArchivoModificado, descomprimido_lz78, total_lz78)) {
+                    cout << "Archivo descomprimido guardado en: " << rutaArchivoModificado << endl;
+                } else {
+                    cout << "Error al guardar el archivo descomprimido" << endl;
+                }
             }
 
             delete[] descomprimido_lz78;
@@ -100,75 +109,79 @@ bool ProbarDescompresion(unsigned char* data, int size, unsigned char* pista, in
 }
 
 /**
- * @brief Busca los parámetros correctos de desencriptación (clave XOR y bits de rotación).
+ * @brief Busca los parametros correctos de desencriptacion (clave XOR y bits de rotacion).
  *
- * Esta función prueba todas las combinaciones posibles de:
+ * Esta funcion prueba todas las combinaciones posibles de:
  * - Claves XOR (0 a 254)
  * - Rotaciones de bits (0 a 7)
  *
- * Para cada combinación, aplica:
- * 1. Operación XOR sobre los datos.
- * 2. Rotación de bits a la derecha.
- * 3. Intento de descompresión y búsqueda de la pista.
+ * Para cada combinacion, intenta descomprimir directamente los datos con los parametros
+ * integrados y busca la pista en el resultado.
  *
- * Si encuentra coincidencia, guarda los parámetros en `nbits` y `claveK`.
+ * Si encuentra coincidencia, guarda los parametros en `nbits` y `claveK`.
  *
  * @param data Puntero a los datos encriptados.
- * @param nbits Variable de salida donde se almacenará la cantidad de bits de rotación encontrada.
- * @param claveK Variable de salida donde se almacenará la clave XOR encontrada.
+ * @param nbits Variable de salida donde se almacenara la cantidad de bits de rotacion encontrada.
+ * @param claveK Variable de salida donde se almacenara la clave XOR encontrada.
  * @param sizeEncriptado Tamaño en bytes del arreglo de datos encriptados.
  * @param sizePista Tamaño en bytes de la pista.
  * @param pista Puntero a la secuencia de bytes a buscar.
- * @param rutaArchivoModificado Ruta donde guardar el archivo descomprimido.
+ * @param rutaArchivoModificado Ruta donde guardar el archivo descomprimido (opcional, puede ser nullptr).
+ * @return true si encuentra los parametros, false en caso contrario.
  */
-void BuscarParametros(unsigned char* data, int& nbits, int& claveK, int sizeEncriptado, int sizePista, unsigned char* pista, const char* rutaArchivoModificado) {
+bool BuscarParametros(unsigned char* data, int& nbits, int& claveK, int sizeEncriptado,
+                      int sizePista, unsigned char* pista, const char* rutaArchivoModificado) {
+
+    // Validacion de entrada
     if (data == nullptr || pista == nullptr) {
         cout << "Error: datos nulos" << endl;
-        return;
+        return false;
     }
 
+    // Verificar que el tamaño sea multiplo de 3
     if (sizeEncriptado % 3 != 0) {
-        cout << "Advertencia: El tamaño no es múltiplo de 3 (formato de terna)" << endl;
+        cout << "Advertencia: El tamaño no es multiplo de 3 (formato de terna)" << endl;
     }
 
+    // Mostrar la pista que estamos buscando
     cout << "Pista a buscar: ";
     mostrarContenido(pista, sizePista);
+    cout << "Iniciando busqueda de parametros..." << endl;
 
     int intentos = 0;
-    const int MAX_INTENTOS = 2040; // 255 * 8
 
-    for (int clave = 0; clave < 255 && intentos < MAX_INTENTOS; clave++) {
-        for (int bits = 0; bits <= 7 && intentos < MAX_INTENTOS; bits++) {
+    // Busqueda exhaustiva con limites
+    for (int clave = 0; clave < 255 ; clave++) {
+        for (int bits = 0; bits <= 7 ; bits++) {
             intentos++;
 
-            // Mostrar progreso cada 200 intentos (opcional)
-            if (intentos % 200 == 0) {
-                // cout << "Progreso: " << intentos << "/" << MAX_INTENTOS
-                //      << " (Clave: " << clave << ", Bits: " << bits << ")" << endl;
+            // Mostrar progreso cada 200 intentos para no saturar la consola
+            if (intentos % 100 == 0) {
+                cout << "Progreso: " << intentos << "/"
+                     << " (Clave: " << clave << ", Bits: " << bits << ")" << endl;
             }
 
-            unsigned char* dataCopia = new unsigned char[sizeEncriptado];
-            for (int k = 0; k < sizeEncriptado; k++) {
-                dataCopia[k] = data[k];
-            }
+            // Probar descompresion directamente con los parametros actuales
+            // No necesitamos copiar ni modificar los datos originales
+            if (ProbarDescompresion(data, sizeEncriptado, pista, sizePista,
+                                    (unsigned char)clave, bits, rutaArchivoModificado)) {
+                cout << "Parametros encontrados!" << endl;
+                cout << "Total de intentos realizados: " << intentos << endl;
 
-            DoXOR(dataCopia, (unsigned char)clave, sizeEncriptado);
-            RotarDerecha(sizeEncriptado, dataCopia, bits);
-
-            if (ProbarDescompresion(dataCopia, sizeEncriptado, pista, sizePista, rutaArchivoModificado)) {
-                cout << "¡Parámetros encontrados!" << endl;
-                cout << "Clave XOR: " << clave << " (0x" << hex << clave << dec << ")" << endl;
-                cout << "Bits de rotación: " << bits << endl;
+                // Guardar los parametros encontrados
                 nbits = bits;
                 claveK = clave;
-                delete[] dataCopia;
-                return;
+                return true;
             }
-
-            delete[] dataCopia;
         }
     }
 
-    cout << "No se encontraron parámetros válidos después de " << intentos << " intentos." << endl;
-}
+    // Si llegamos aqui, no se encontraron parametros validos
+    cout << "No se encontraron parametros validos despues de " << intentos << " intentos." << endl;
+    cout << "Posibles causas:" << endl;
+    cout << "- Los datos no estan en formato de ternas" << endl;
+    cout << "- La pista no existe en el texto descomprimido" << endl;
+    cout << "- Los algoritmos de descompresion necesitan ajustes" << endl;
 
+    return false;
+}

@@ -7,7 +7,6 @@ SOURCES += \
         BusquedaParametros.cpp \
         CompresionDescompresion.cpp \
         ManipulacionTexto.cpp \
-        OperacionesDeBits.cpp \
         main.cpp
 
 HEADERS += \
